@@ -1,12 +1,19 @@
 
 from connectors.interface import DNSUpdater
+import cloudflare
 
 class CloudflareUpdater(DNSUpdater):
-    def __init__(self, api_token: str):
-        self.api_token = api_token
 
-    def update_record(self, domain: str, record_type: str, name: str, value: str) -> bool:
-        # Simulated implementation. Replace with real API calls.
-        print(f"[Cloudflare] Updating {record_type} record for {name}.{domain} to {value}")
-        # Here you would use requests to call the Cloudflare API.
-        return True
+    cf = None
+
+    def __init__(self):
+        self.cf = cloudflare.Cloudflare()
+
+    def update_record(self, zone_id, record_id, name, record_type, value) -> bool:
+        res = self.cf.dns.records.update(dns_record_id=record_id,
+                                   name=name,
+                                   zone_id=zone_id,
+                                   comment="",
+                                   content=value,
+                                   type=record_type)
+        return res.content == value
