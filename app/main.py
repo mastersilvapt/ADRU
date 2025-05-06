@@ -52,7 +52,7 @@ def main():
     load_dotenv()
 
     parser = argparse.ArgumentParser(description="DNS Updater Tool")
-    parser.add_argument('--cronjob')
+    parser.add_argument('--cronjob', action="store_true")
     subparsers = parser.add_subparsers(dest="provider", help="DNS provider to use")
 
     # Subparser for Cloudflare
