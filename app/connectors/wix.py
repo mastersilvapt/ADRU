@@ -7,7 +7,7 @@ from connectors.interface import DNSUpdater
 
 class WixUpdater(DNSUpdater):
     def __init__(self, api_key=None):
-        self.api_key = api_key or os.getenv("WIX_API_KEY")
+        self.api_key = api_key or os.getenv("API_TOKEN")
         if not self.api_key:
             raise ValueError("WIX_API_KEY is required")
         self.base_url = "https://www.wixapis.com/domains/v1/dns-zones"
