@@ -1,6 +1,8 @@
 import argparse
 import os
 import logging
+from time import sleep
+
 from dotenv import load_dotenv
 
 # Import all updaters
@@ -50,6 +52,7 @@ def main():
     load_dotenv()
 
     parser = argparse.ArgumentParser(description="DNS Updater Tool")
+    parser.add_argument('--cronjob')
     subparsers = parser.add_subparsers(dest="provider", help="DNS provider to use")
 
     # Subparser for Cloudflare
@@ -97,15 +100,23 @@ def main():
 
     updater = updater_class()
 
-    changed, value = get_ip()
-    if changed:
-        success = updater.update_record(zone_id, record_id, name, record_type, value)
-        if success:
-            logging.info(f"DNS record updated. New IP: {value}")
+    is_cronjob = getattr(args, "cronjob", False)
+
+    timeout = int(os.environ.__contains__("TIMEOUT") and os.environ["TIMEOUT"]) or 3600
+
+    while True:
+        changed, value = get_ip()
+        if changed:
+            success = updater.update_record(zone_id, record_id, name, record_type, value)
+            if success:
+                logging.info(f"DNS record updated. New IP: {value}")
+            else:
+                logging.error(f"Failed to update DNS record. New IP: {value}")
         else:
-            logging.error(f"Failed to update DNS record. New IP: {value}")
-    else:
-        logging.info("No IP change. Skipping update.")
+            logging.info("No IP change. Skipping update.")
+        if is_cronjob :
+            break
+        sleep(timeout)
 
 
 if __name__ == "__main__":

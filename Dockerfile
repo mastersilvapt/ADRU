@@ -6,4 +6,6 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
+COPY .env /app/.env
+
 CMD ["python", "main.py"]
