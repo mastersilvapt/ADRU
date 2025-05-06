@@ -79,10 +79,21 @@ def main():
         exit(1)
 
     # Load arguments (with .env fallback)
-    zone_id = getattr(args, "zone_id", None) or os.getenv("CLOUDFLARE_ZONE_ID")
-    record_id = getattr(args, "record_id", None) or os.getenv("CLOUDFLARE_DNS_RECORD_ID")
-    name = getattr(args, "name", None) or os.getenv("CLOUDFLARE_DNS_RECORD_NAME")
-    record_type = getattr(args, "type", None) or os.getenv("CLOUDFLARE_DNS_RECORD_TYPE")
+    zone_id = getattr(args, "zone_id", None) or os.getenv("ZONE_ID")
+    record_id = getattr(args, "record_id", None) or os.getenv("DNS_RECORD_ID")
+    name = getattr(args, "name", None) or os.getenv("DNS_RECORD_NAME")
+    record_type = getattr(args, "type", None) or os.getenv("DNS_RECORD_TYPE")
+
+    missing = [k for k, v in {
+        "zone-id": zone_id,
+        "record-id": record_id,
+        "name": name,
+        "type": record_type,
+    }.items() if v is None]
+
+    if missing:
+        logging.error(f"Missing required parameters: {', '.join(missing)}")
+        exit(1)
 
     updater = updater_class()
 
